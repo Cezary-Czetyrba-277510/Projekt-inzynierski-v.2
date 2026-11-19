@@ -113,7 +113,7 @@ class Node(NodeLike, Drawable):
         with bfs(self) as search:
             def draw_edges(vertex):
                 for this_node, other_node in vertex.edges:
-                    dot.node(str(id(other_node)), str(other_node.output))
+                    dot.node(str(id(other_node)), str(other_node.wartosc))
                     dot.edge(str(id(this_node)), str(id(other_node)))
 
                 return
