@@ -6,8 +6,10 @@ import numpy
 from graphs import AhoCorasick
 from nodes import Node, bfs
 from ownstring import Wzorzec
+from traits import Alphabetizable, zalfabetyzuj
 
-class Markov:
+
+class Markov(Alphabetizable):
     @classmethod
     def zmacierzuj(cls, root: Node):
         """
@@ -16,8 +18,6 @@ class Markov:
         :return: Gotowa macierz Markowa.
         """
 
-        alphabet = {"A": 0.5, "B": 0.5}
-        # todo zrobic zeby alfabet byl wstrzykiwany
         macierz =  numpy.empty((0, 0), dtype=float)
 
         with bfs(root) as search:
@@ -33,7 +33,7 @@ class Markov:
 
                 i = search.visited[node]
 
-                for char, pstwo in alphabet.items():
+                for char, pstwo in cls.alfabet.items():
                     child = node[char]
                     if child is None:
                         child = root
@@ -59,9 +59,10 @@ class Markov:
         return macierz
 
     def __init__(self, *wzorce: Wzorzec):
-        self.graf_niezdeterminowany = AhoCorasick(wzorce) # graf niezdeterminowany
+        zalfabetyzowany_aho_corasick = zalfabetyzuj(self.alfabet)(AhoCorasick)
+        self.graf_niezdeterminowany = zalfabetyzowany_aho_corasick(wzorce) # graf niezdeterminowany
         kopia = copy.deepcopy(self.graf_niezdeterminowany)
         # https://pl.wikipedia.org/wiki/Algorytm_Aho-Corasick#Determinizacja_automatu
-        self.graf = AhoCorasick.determinize(kopia)
+        self.graf = zalfabetyzowany_aho_corasick.determinize(kopia)
         self.macierz = self.zmacierzuj(self.graf)
         return

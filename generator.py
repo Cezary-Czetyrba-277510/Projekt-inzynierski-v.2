@@ -1,44 +1,38 @@
 # zewnetrzne
 import sys
 from fractions import Fraction
-from typing import Literal, Any
+from typing import Literal
+from types import SimpleNamespace, TracebackType
 
 # nasze
 from common import ogranicz
 from ownstring import Wzorzec
-
-from types import TracebackType
+from markov import Markov
+from traits import zalfabetyzuj
 
 class Generator:
-    @classmethod
-    def zarejestruj(cls):
-        return
-
-    @classmethod
-    def wstrzyknij(cls, klasa: type, args: dict[Literal, Any]):
-        return type(
-            f"fszczyknięty_{klasa.__name__}", (klasa,),
-            args
-        )
-
-    def __init__(self, alfabet: dict[Literal, Fraction], warunek):
+    def __init__(self, alfabet: dict[Literal, Fraction], warunek = None):
         self.alfabet = alfabet
         self.warunek = warunek
+        self.namespace = SimpleNamespace()
 
-        self.Wzorzec = ogranicz(alfabet, warunek)(self.wstrzyknij(Wzorzec, {"alfabet": alfabet, "warunki": warunek}))
+    def __getattr__(self, name):
+        try:
+            return getattr(self.namespace, name)
+        except AttributeError:
+            try:
+                return globals()[name]
+            except KeyError:
+                raise AttributeError(name) from None
 
     def __enter__(self):
+        wzorzec = ogranicz(self.alfabet, self.warunek)(Wzorzec)
+        setattr(self.namespace, wzorzec.__name__, wzorzec)
+
+        markov = zalfabetyzuj(self.alfabet)(Markov)
+        setattr(self.namespace, markov.__name__, markov)
+
         return self
-
-    def __getattr__(self, item):
-        """Ta metoda specjalna wstrzykuje w sposób domyślny informacje o alfabecie do obiektów zależnych."""
-        for module in sys.modules.values():
-            if module is not None:
-                namespace = vars(module)
-                if item in namespace:
-                    return namespace[item]
-        return None
-
 
     def __exit__(self, exc_type: type[BaseException] | None, exc_val: BaseException | None, exc_tb: TracebackType | None):
         return False

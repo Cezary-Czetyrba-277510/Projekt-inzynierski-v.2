@@ -4,7 +4,7 @@ from functools import partial
 # nasze
 from common import flatten
 from nodes import Node, NodeLike, bfs
-from traits import Drawable
+from traits import Drawable, Alphabetizable
 from typecheck import implements
 from ownstring import Wzorzec
 
@@ -56,7 +56,7 @@ class Trie(Graph):
 
         return root
 
-class AhoCorasick(Graph):
+class AhoCorasick(Alphabetizable, Graph):
     class AhoNode(Node):
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
@@ -131,9 +131,8 @@ class AhoCorasick(Graph):
 
     # //AhoCorasickNode
 
-    @staticmethod
-    def determinize(root):
-        # todo zamienic {"A", "B"} na alfabet wstrzykiwany
+    @classmethod
+    def determinize(cls, root):
         """
         Determinizacja grafu, czyli (w skrócie) spowodowanie, że każda zmiana stanu powoduje wykonanie tylko jednego przejścia w grafie.
         :param root: Wierzchołek grafu. Niestety wierzchołek musi wiedzieć o tym, jaki jest korzeń,
@@ -142,13 +141,12 @@ class AhoCorasick(Graph):
         """
         # Słownik "memoizacyjny"
         new_edges = {}
-        alphabet = {"A", "B"}
 
         with bfs(root) as search:
             def inner(x):
                 edges = []
 
-                for char in alphabet:
+                for char in cls.alfabet:
                     current_node = x
                     # Przeskakujemy z wierzchołka do wierzchołka do momentu, aż znajdziemy wierzchołek z legalnym przejściem.
                     while current_node is not root and current_node.next(char) is current_node:
@@ -167,6 +165,7 @@ class AhoCorasick(Graph):
         # Krawędzie można legalnie zamienić dopiero po zastosowaniu algorytmu bfs.
         # W przeciwnym razie będziemy modyfikowali wierzchołki w trakcie iteracji po nich.
         # Być może jest to legalne w niektórych implementacjach ale to jednak trochę trudne.
+
         for node, edges in new_edges.items():
             node.neighbors = edges
             node.fail = None
