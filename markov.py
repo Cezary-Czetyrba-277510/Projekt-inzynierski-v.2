@@ -1,6 +1,7 @@
 # zewnetrzne
 import copy
 from fractions import Fraction
+import random
 
 import numpy
 
@@ -60,11 +61,39 @@ class Markov(Alphabetizable):
 
         return macierz
 
+    def wykonaj_krok(self):
+        char, *_ = random.choices(
+            population=list(self.alfabet.keys()),
+            weights=list(self.alfabet.values()),
+            k=1
+        )
+
+        self.current = self.current[char]
+
+        return char
+
+    def symuluj(self):
+        napis = ""
+        self.n = 0
+        while not "".join(self.current.output) in self.wzorce:
+            char = self.wykonaj_krok()
+            napis += char
+            self.n += 1
+
+        return napis, "".join(self.current.output), self.n
+
     def __init__(self, *wzorce: Wzorzec):
+        self.wzorce = wzorce
+
         zalfabetyzowany_aho_corasick = zalfabetyzuj(self.alfabet)(AhoCorasick)
         self.graf_niezdeterminowany = zalfabetyzowany_aho_corasick(wzorce) # graf niezdeterminowany
+
         kopia = copy.deepcopy(self.graf_niezdeterminowany)
         # https://pl.wikipedia.org/wiki/Algorytm_Aho-Corasick#Determinizacja_automatu
         self.graf = zalfabetyzowany_aho_corasick.determinize(kopia)
+
         self.macierz = self.zmacierzuj(self.graf)
+        self.n = 0
+
+        self.current = self.graf
         return
