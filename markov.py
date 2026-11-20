@@ -1,5 +1,7 @@
 # zewnetrzne
 import copy
+from fractions import Fraction
+
 import numpy
 
 # nasze
@@ -18,7 +20,7 @@ class Markov(Alphabetizable):
         :return: Gotowa macierz Markowa.
         """
 
-        macierz =  numpy.empty((0, 0), dtype=float)
+        macierz =  numpy.empty((0, 0), dtype=object)
 
         with bfs(root) as search:
             def inner(node: Node):
@@ -43,7 +45,7 @@ class Markov(Alphabetizable):
                     n = len(search.visited)
 
                     if macierz.shape[0] < n:
-                        expanded = numpy.zeros((n, n))
+                        expanded = numpy.full((n, n), Fraction(0), dtype=object)
                         expanded[:macierz.shape[0], :macierz.shape[1]] = macierz
                         macierz = expanded
 
