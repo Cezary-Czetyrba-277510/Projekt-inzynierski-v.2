@@ -1,6 +1,8 @@
 # zewnetrzne
 from functools import partial
 
+from graphviz import Digraph
+
 # nasze
 from common import flatten
 from nodes import Node, NodeLike, bfs
@@ -129,6 +131,21 @@ class AhoCorasick(Alphabetizable, Graph):
 
                 child.fail = fail_node.next(child.wartosc) if fail_node.next(child.wartosc) is not fail_node else root
 
+        def draw(self, filename: str = "graph"):
+            dot = Digraph('G', filename=f"{filename}.gv", engine='sfdp')
+            dot.node(str(id(self)), str(self.wartosc))
+
+            with bfs(self) as search:
+                def draw_method(vertex):
+                    for this_node, other_node, options in vertex.edges:
+                        dot.node(str(id(other_node)), str("".join(other_node.output) if other_node.output else "root"))
+                        dot.edge(str(id(this_node)), str(id(other_node)), **options)
+
+                    return
+
+                search.begin(draw_method)
+
+            return dot
     # //AhoCorasickNode
 
     @classmethod
@@ -179,6 +196,7 @@ class AhoCorasick(Alphabetizable, Graph):
         """
         builder = Trie[cls.AhoNode]
         root = builder(*wzorce)
+        root.draw("trie").render()
 
         # zignorować błędy unexpected argument i błędy o typowaniu
         # chyba wbudowany type checker nie domaga i przy ewaluacji typu Trie[cls.AhoNode] od razu zakłada, że typ builder to klasa Trie kiedy to nieprawda
