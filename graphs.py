@@ -194,7 +194,6 @@ class AhoCorasick(Alphabetizable, Graph):
         """
         builder = Trie[cls.AhoNode]
         root = builder(*wzorce)
-        root.draw("trie").render()
 
         # zignorować błędy unexpected argument i błędy o typowaniu
         # chyba wbudowany type checker nie domaga i przy ewaluacji typu Trie[cls.AhoNode] od razu zakłada, że typ builder to klasa Trie kiedy to nieprawda
