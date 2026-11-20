@@ -1,5 +1,4 @@
 # zewnetrzne
-import sys
 from fractions import Fraction
 from typing import Literal
 from types import SimpleNamespace, TracebackType

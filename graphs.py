@@ -69,17 +69,6 @@ class AhoCorasick(Alphabetizable, Graph):
             self.output = []
 
         @property
-        def outgoing(self):
-            a = []
-            if self.fail is not None:
-                a = [self.fail]
-
-            return self.neighbors + a
-
-        def get_subgraph_edges(self):
-            return [(self, each) for each in self.neighbors] + flatten([each.get_subgraph_edges() for each in self.neighbors])
-
-        @property
         def edges(self):
             edges = [(self, neighbor, {"label": f"{label}"}) for neighbor, label in self.neighbors]
             if self.fail:
@@ -132,7 +121,16 @@ class AhoCorasick(Alphabetizable, Graph):
                 child.fail = fail_node.next(child.wartosc) if fail_node.next(child.wartosc) is not fail_node else root
 
         def draw(self, filename: str = "graph"):
+
             dot = Digraph('G', filename=f"{filename}.gv", engine='sfdp')
+            dot.attr(
+                splines="true",
+                overlap="false",
+                sep="+20",
+                esep="+10",
+                concentrate="false"
+            )
+
             dot.node(str(id(self)), str(self.wartosc))
 
             with bfs(self) as search:
