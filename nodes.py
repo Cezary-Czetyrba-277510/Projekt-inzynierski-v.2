@@ -45,7 +45,7 @@ class bfs:
         while self.fifo:
             self.current = self.fifo.popleft()
 
-            for child in self.current.neighbors:
+            for child, *_ in self.current.neighbors:
                 if child not in self.visited:
                     self.visited[child] = len(self.visited)
                     self.fifo.append(child)
@@ -89,10 +89,10 @@ class Node(NodeLike, Drawable):
         :param value:
         :return:
         """
-        for child in self.neighbors:
-            if child.wartosc == value:
-                return child
-        return None
+        return next(
+            (neighbor for neighbor, label in self.neighbors if label == value),
+            None
+        )
 
     def __repr__(self) -> str:
         return f"{self.wartosc}"

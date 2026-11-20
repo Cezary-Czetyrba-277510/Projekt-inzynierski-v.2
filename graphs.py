@@ -41,14 +41,14 @@ class Trie(Graph):
 
             for char in wzorzec:
                 child = next(
-                    (child for child in node.neighbors if child.wartosc == char),
+                    (child for child, label in node.neighbors if label == char),
                     None
                 )
 
                 if child is None:
-                    child = node_type(wartosc=char, *args, **kwargs)
+                    child = node_type(wartosc=char, root=root, *args, **kwargs)
                     child.output = node.output + [char] # akumulacja literek występujących w poprzednich wierzchołkach
-                    node.neighbors.append(child)
+                    node.neighbors.append((child, char))
 
                 node = child
 
@@ -60,8 +60,9 @@ class Trie(Graph):
 
 class AhoCorasick(Alphabetizable, Graph):
     class AhoNode(Node):
-        def __init__(self, *args, **kwargs):
+        def __init__(self, root = None, *args, **kwargs):
             super().__init__(*args, **kwargs)
+            self.root = root if root is not None else self
             self.fail = None # po determinizacji fail również będzie None
             # ponieważ prekomputujemy przejścia tak, żeby każda kolejna literka dołączana do napisu
             # powodowała tylko jedno przejście pomiędzy wierzchołkami
@@ -80,11 +81,10 @@ class AhoCorasick(Alphabetizable, Graph):
 
         @property
         def edges(self):
-            a = []
-            if self.fail is not None:
-                a = [(self, self.fail)]
-
-            return [(self, each) for each in self.neighbors] + a
+            edges = [(self, neighbor, {"label": f"{label}"}) for neighbor, label in self.neighbors]
+            if self.fail:
+                edges += [(self, self.fail, {"label": "fail", "color": "red", "style": "dotted"})]
+            return edges
 
         @edges.setter
         def edges(self, new_edges):
@@ -111,11 +111,11 @@ class AhoCorasick(Alphabetizable, Graph):
                 # ponieważ drzewo prefiksowe scala te same prefiksy,
                 # oraz że każdy wierzchołek-dziecko korzenia odwołuje się fail linkiem do korzenia (bo jedyny prefiks właściwy napisów jednoliterowych to pusty napis)
 
-                for child in self.neighbors:
+                for child, *_ in self.neighbors:
                     child.fail = root
                 return
 
-            for child in self.neighbors:
+            for child, *_ in self.neighbors:
                 # czasami wierzchołek może być swoim własnym failem.
                 # przykład: alfabet {A, B}, wzorce ABB, ABA
                 # wierzchołek reprezentujący stan A ma standardową krawędź tylko do AB, natomiast ma fail link do samego siebie.
@@ -173,7 +173,7 @@ class AhoCorasick(Alphabetizable, Graph):
                     # jeżeli takiego nie ma dołóżmy przejście do stanu pustego (korzenia).
                     # funkcja next przy braku znalezienia sąsiada o wartości char zwraca self.
                     last_transition = current_node.next(char)
-                    edges.append(last_transition if last_transition is not current_node else root)
+                    edges.append((last_transition if last_transition is not current_node else root, char))
 
                 new_edges[x] = edges
 
