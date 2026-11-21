@@ -1,13 +1,9 @@
 # zewnetrzne
 from itertools import product
-import numpy as np
-import matplotlib.pyplot as plt
-import sympy
 from fractions import Fraction
 
 # nasze
 from generator import Generator
-from markov import Markov
 from common import Symbol
 
 def main():

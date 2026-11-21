@@ -2,8 +2,6 @@
 from fractions import Fraction
 import unittest
 
-import sympy
-
 # nasze
 from generator import Generator
 from wyjatki import *
