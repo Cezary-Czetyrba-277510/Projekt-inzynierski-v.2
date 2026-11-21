@@ -1,6 +1,6 @@
 # zewnetrzne
 from fractions import Fraction
-from typing import Callable, Protocol, TypeVar, Iterator, runtime_checkable, Literal
+from typing import Callable, Protocol, TypeVar, Iterator, runtime_checkable
 import re # regular expressions; wyrażenia regularne
 import sympy
 
@@ -56,19 +56,17 @@ class Symbol:
 
     __hash__ = object.__hash__
 
-def ogranicz(alfabet: dict[Literal, Fraction], warunek: sympy.Expr | None = None, *args, **kwargs) -> Callable:
+def ogranicz(alfabet: dict[str, Fraction], warunek: sympy.Expr | None = None, /) -> Callable:
     """
     Funkcja ograniczająca dozwolone wartości i nakładająca konieczne warunki w stylu (x R n) gdzie x to długość napisu, R to relacja częściowego porządku, n to liczba naturalna.
     :param alfabet: Zbiór dozwolonych znaczków.
     :param warunek: Nałożony warunek na długość napisu.
-    :param args: tak o żeby można było ewentualnie podawać do dalszych funkcji.
-    :param kwargs: tak o żeby można było ewentualnie podawać do dalszych funkcji.
     :return: Dekorator klasy walidujący napisy przekazane do jej konstruktora.
 
     Inner jest wywoływany zgodnie z treścią https://docs.python.org/3/glossary.html#term-decorator
     """
 
-    def inner(cls, *args, **kwargs) -> type:
+    def inner(cls, /) -> type:
         # sprawdzane jest tylko raz przy tworzeniu klasy
         if sum(alfabet.values()) != 1:
             raise ValueError(f"W klasie {cls.__name__} prawdopodobieństwa nie sumują się do 1.")
