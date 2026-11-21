@@ -16,6 +16,24 @@ def main():
     with Generator(alfabet, (n == 3)) as gen:
         wzorzec1 = gen.Wzorzec("BAB")
         wzorzec2 = gen.Wzorzec("ABA")
+        # Można rozszerzyć te wzorce, żeby nie były tylko literałami, ale też wyrażeniami regularnymi z lookbackiem.
+        # To modelowałoby proces Markowa który "pamiętałby" od n-tego kroku k-kroków do tyłu.
+        # Przykład:
+        # wzorzec1 = gen.Wzorzec("B.{4}AAB")
+        # wzorzec byłby listą napisów, które mają na początku B, 4 dowolne litery (z alfabetu) i na końcu AAB.
+        # Wtedy każdy napis z tej listy byłby stanem końcowym.
+        # W algorytmie konstrukcji przestrzeni stanów takie wyrażenie regularne byłoby prekomputowane do listy wszystkich możliwych
+        # napisów spełniających warunek B na początku, 4 dowolne litery i AAB na końcu.
+        # Można jeszcze skomplikować pisząc wzorzec, który ma na początku B, 2 miejsca do przodu nie ma A, 2 miejsca znowu do przodu mamy AAB
+        # wzorzec 1 = gen.Wzorzec("B.{2}[^A].{2}AAB")
+        # Albo pisać wzorce, które mają cały alfabet A-Z i jednocześnie te same warunki co wcześniej.
+        # wzorzec1 = gen.Wzorzec("B.{2}[^ABC].{2}AAB")
+        # wzorzec, który nie ma ani A, ani B, ani C na 6 miejscu od końca, ale ma dozwolone przynajmniej literki A, B, C
+        # kropka to tzw. wildcard, który przepuści match bez względu na to, jaki znaczek tam występuje.
+        # Zaimplementowany proces Markowa, który patrzy się k miejsc do tyłu, potrzebuje funkcji (najlepiej anonimowej),
+        # która jest wywoływana w trakcie budowy macierzy Markowa.
+        # Taka funkcja będzie budować prawdopodobieństwa warunkowe, które będą prawdopodobieństwami przejścia ze stanu i do stanu j.
+
 
         markov = gen.Markov(wzorzec1, wzorzec2)
         napis, rezultat, kroki = markov.symuluj()
