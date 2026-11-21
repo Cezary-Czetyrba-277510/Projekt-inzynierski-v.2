@@ -182,7 +182,7 @@ class AhoCorasick(Alphabetizable, Graph):
 
         with bfs(root) as search:
             def inner(x):
-                edges = []
+                each_iter_edges = []
 
                 for char in cls.alfabet:
                     current_node = x
@@ -194,9 +194,9 @@ class AhoCorasick(Alphabetizable, Graph):
                     # Jeżeli takiego nie ma, dołóżmy przejście do stanu pustego (korzenia).
                     # Funkcja next przy braku znalezienia sąsiada o wartości char zwraca self.
                     last_transition = current_node.next(char)
-                    edges.append((last_transition if last_transition is not current_node else root, char))
+                    each_iter_edges.append((last_transition if last_transition is not current_node else root, char))
 
-                new_edges[x] = edges
+                new_edges[x] = each_iter_edges
 
             search.begin(inner)
 
