@@ -1,10 +1,10 @@
 # zewnętrzne
 from functools import partial
+from typing import Callable, TypeVar
 
 from graphviz import Digraph
 
 # nasze
-from common import flatten
 from nodes import Node, NodeLike, bfs
 from traits import Drawable, Alphabetizable
 from typecheck import implements
@@ -23,7 +23,7 @@ class Trie(Graph):
     Trie[Node] wywołuje __class_getitem__ w definicji tej klasy i zwraca funkcję częściową z wypełnionym argumentem node_type
     Uwaga: node_type powinien implementować (niekoniecznie dziedziczyć po) klasie NodeLike (bo chcemy, żeby wierzchołkami były obiekty, które zachowują się jak wierzchołki)
     """
-    def __class_getitem__[T: NodeLike](cls, node_type: type[T]) -> partial[T]:
+    def __class_getitem__[T: NodeLike](cls, node_type: type[T]) -> Callable[..., NodeLike]:
         if not implements(node_type, NodeLike):
             raise TypeError(f"Typ powinien implementować atrybuty i metody jak z klasy {NodeLike.__name__}")
         return partial(cls.build, node_type=node_type)

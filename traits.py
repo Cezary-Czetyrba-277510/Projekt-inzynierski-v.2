@@ -8,7 +8,7 @@ class Drawable(Protocol):
     def draw(self, *args, **kwargs) -> Any: pass
 
 class Alphabetizable(Protocol):
-    alfabet: ClassVar[dict[str, int] | set[str]]
+    alfabet: ClassVar[dict[str, int]]
 
 T = TypeVar("T", bound=Alphabetizable)
 def zalfabetyzuj(alfabet): # dekorator
