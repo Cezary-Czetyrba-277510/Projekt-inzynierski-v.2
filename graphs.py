@@ -47,7 +47,6 @@ class Trie(Graph):
 
                 if child is None:
                     child = node_type(wartosc=char, root=root, *args, **kwargs)
-                    child.output = node.output + [char] # akumulacja literek występujących w poprzednich wierzchołkach
                     node.neighbors.append((child, char))
 
                 node = child
@@ -62,11 +61,32 @@ class Trie(Graph):
 
 
 class AhoCorasick(Alphabetizable, Graph):
+    class AhoList(list):
+        T = TypeVar("T", bound=NodeLike)
+
+        def __init__(self, parent, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.parent = parent
+
+        def append(self, obj: T, /) -> None:
+            node, *_ = obj
+            node.output = self.parent.output + [node.wartosc]
+            return super().append(obj)
+
+        def __reduce_ex__(self, protocol):
+            # Rebuild as an empty list, then restore the items directly
+            # so the overridden append never runs during the copy.
+            return (self.__class__, (self.parent,), {"items": list(self)})
+
+        def __setstate__(self, state):
+            list.extend(self, state["items"])
+
     class AhoNode(Node):
         def __init__(self, root = None, *args, **kwargs):
             super().__init__(*args, **kwargs)
+            self.output = []
             self.root = root if root is not None else self
-            self.fail = None # po determinizacji fail również będzie None
+            self.neighbors = AhoCorasick.AhoList(self)
             self.fail = None # Po determinizacji fail również będzie None,
             # ponieważ prekomputujemy przejścia tak, żeby każda kolejna literka dołączana do napisu
             # powodowała tylko jedno przejście pomiędzy wierzchołkami.
