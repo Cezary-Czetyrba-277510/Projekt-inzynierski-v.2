@@ -13,7 +13,7 @@ from common import Symbol
 def main():
 
     # niech alfabet będzie bezprefiksowy i niech alfabet będzie miał tylko znaki, które są pojedynczymi tokenami
-    # przykład kiedy alfabet nie jest bezprefiksowy ale da się zrobić dekoding: {0, 01, 11}
+    # przykład, kiedy alfabet nie jest bezprefiksowy, ale da się zrobić dekoding: {0, 01, 11}
     # https://en.wikipedia.org/wiki/Sardinas%E2%80%93Patterson_algorithm
     n = Symbol("dlugosc")
     alfabet = {"A": Fraction(1, 2), "B": Fraction(1, 2)}
@@ -38,8 +38,6 @@ def main():
             wzorzec2 = gen.Wzorzec(napis2)
             parowy_markov = gen.Markov(wzorzec1, wzorzec2)
             wyniki.append((wzorzec1, wzorzec2, parowy_markov.symuluj()))
-
-
 
     return
 

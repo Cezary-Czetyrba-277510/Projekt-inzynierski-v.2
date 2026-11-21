@@ -12,7 +12,7 @@ def declared_members(cls: type) -> set[str]:
 
 def implements(cls: type, protocol: type) -> bool:
     """
-    Funkcja sprawdzająca czy klasa ma zaimplementowane atrybuty i metody z protocol.
+    Funkcja sprawdzająca, czy klasa ma zaimplementowane atrybuty i metody z protocol.
     Konieczne z powodu ograniczenia na runtime check https://github.com/python/typing/pull/464
     """
     required: set[str] = set()

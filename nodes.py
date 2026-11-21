@@ -12,7 +12,7 @@ class bfs:
     Klasa reprezentująca algorytm breadth-first search.
     Właściwa funkcja implementująca bfs to funkcja search().
     Ta klasa implementuje domknięcie (leksykalne) za pomocą context-managementu (funkcje magiczne __enter__ i __exit__)
-    Dobrzer wyglądająca składnia, nawet całkiem odpowiadająca semantyce przeszukiwania.
+    Dobrze wyglądająca składnia, nawet całkiem odpowiadająca semantyce przeszukiwania.
     """
     def __init__(self, root):
         self.root = root
@@ -39,7 +39,7 @@ class bfs:
         :return: Nic. Wszelkie zmiany stanu są powodowane przez funkcję lmbd.
 
         Uwaga, aby nie zmieniać w danym wierzchołku wierzchołków sąsiadujących, ponieważ zmieni to zachowanie bfs.
-        Dopuszczalne jest modyfikowanie zbioru wierzchołków odwiedzonych w callbacku definiowanym w kontekście ale trzeba być ostrożnym.
+        Dopuszczalne jest modyfikowanie zbioru wierzchołków odwiedzonych w callbacku definiowanym w kontekście, ale trzeba być ostrożnym.
         """
 
         while self.fifo:

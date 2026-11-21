@@ -1,4 +1,4 @@
-# zewnetrzne
+# zewnętrzne
 from functools import partial
 
 from graphviz import Digraph
@@ -17,9 +17,9 @@ class Graph(Drawable):
 class Trie(Graph):
     """
     Klasa tworząca drzewo prefiksowe (trie).
-    Ta klasa nie jest klasą która tworzy obiekty swojego typu (czyli nie powinno się używać jej konstruktowa)
-    ale jest klasą która buduje builder na podstawie dostarczonego typu (node_type)
-    jusedź: x = Trie[Node](Wzorzec("ABC"), Wzorzec("BCA"))
+    Ta klasa nie jest klasą, którą tworzy obiekty swojego typu (czyli nie powinno się używać jej konstruktora),
+    ale jest klasą, którą buduje builder na podstawie dostarczonego typu (node_type)
+    jusedż: x = Trie[Node](Wzorzec("ABC"), Wzorzec("BCA"))
     Trie[Node] wywołuje __class_getitem__ w definicji tej klasy i zwraca funkcję częściową z wypełnionym argumentem node_type
     Uwaga: node_type powinien implementować (niekoniecznie dziedziczyć po) klasie NodeLike (bo chcemy, żeby wierzchołkami były obiekty, które zachowują się jak wierzchołki)
     """
@@ -33,7 +33,7 @@ class Trie(Graph):
         root = node_type()
 
         for wzorzec in wzorce:
-            # najpierw budujemy jedną odnogę grafu dla pierwszego wzorca, a później budujemy drugą odnogę używając pierwszych N wierzchołków takich, że w N-tym wierzchołku skumulowany output
+            # Najpierw budujemy jedną odnogę grafu dla pierwszego wzorca, a później budujemy drugą odnogę, używając pierwszych N wierzchołków takich, że w N-tym wierzchołku skumulowany output
             # (sklejone literki z poprzednich wierzchołków) są maksymalnym wspólnym prefiksem pierwszego i drugiego wzorca.
             # w N+1 wierzchołku rozklejamy się na bok.
 
@@ -52,11 +52,14 @@ class Trie(Graph):
 
                 node = child
 
-            # kiedy wyczerpiemy literki ze wzorca możemy manualnie oznaczyć wierzchołek jako liść
-            # albo możemy w definicji klasy wierzchołka napisać, że wierzchołek jest liściem kiedy lista sąsiadów jest pusta.
+            # Kiedy wyczerpiemy literki ze wzorca, możemy manualnie oznaczyć wierzchołek jako liść
+            # albo możemy w definicji klasy wierzchołka napisać, że wierzchołek jest liściem, kiedy lista sąsiadów jest pusta.
+
             # node.end = True
 
         return root
+
+
 
 class AhoCorasick(Alphabetizable, Graph):
     class AhoNode(Node):
@@ -64,9 +67,9 @@ class AhoCorasick(Alphabetizable, Graph):
             super().__init__(*args, **kwargs)
             self.root = root if root is not None else self
             self.fail = None # po determinizacji fail również będzie None
+            self.fail = None # Po determinizacji fail również będzie None,
             # ponieważ prekomputujemy przejścia tak, żeby każda kolejna literka dołączana do napisu
-            # powodowała tylko jedno przejście pomiędzy wierzchołkami
-            self.output = []
+            # powodowała tylko jedno przejście pomiędzy wierzchołkami.
 
         @property
         def edges(self):
@@ -95,8 +98,8 @@ class AhoCorasick(Alphabetizable, Graph):
             # wierzchołek "failowy" (połączony krawędzią fail z W) będzie płytszy niż ten W
 
             if self is root:
-                # na dzień dobry wszystkie wierzchołki bezpośrednio sąsiadujące z korzeniem mają fail-krawędzie do korzenia.
-                # konstrukcja drzewa prefiksowego gwarantuje nam, że nie ma dwóch wierzchołków które odwołują się do siebie nawzajem na tej samej głębokości,
+                # Na dzień dobry wszystkie wierzchołki bezpośrednio sąsiadujące z korzeniem mają fail-krawędzie do korzenia.
+                # Konstrukcja drzewa prefiksowego gwarantuje nam, że nie ma dwóch wierzchołków, które odwołują się do siebie nawzajem na tej samej głębokości,
                 # ponieważ drzewo prefiksowe scala te same prefiksy,
                 # oraz że każdy wierzchołek-dziecko korzenia odwołuje się fail linkiem do korzenia (bo jedyny prefiks właściwy napisów jednoliterowych to pusty napis)
 
@@ -105,14 +108,14 @@ class AhoCorasick(Alphabetizable, Graph):
                 return
 
             for child, *_ in self.neighbors:
-                # czasami wierzchołek może być swoim własnym failem.
-                # przykład: alfabet {A, B}, wzorce ABB, ABA
+                # Czasami wierzchołek może być swoim własnym failem.
+                # Przykład: alfabet {A, B}, wzorce ABB, ABA
                 # wierzchołek reprezentujący stan A ma standardową krawędź tylko do AB, natomiast ma fail link do samego siebie.
                 fail_node = self.fail
 
                 # odpowiednikiem funkcji NEXT jest self.next()
                 # node.next(char) zwraca obiekt, który jest następnikiem tego wierzchołka i ma wartość dokładnie (char)
-                # lub siebie jeżeli nie ma następnika z taką wartością
+                # lub siebie, jeżeli nie ma następnika z taką wartością
                 # odpowiednikiem funkcji FAIL jest fail_edge
                 # OUTPUT przy budowie jest raczej niepotrzebny
                 while fail_node is not root and fail_node.next(child.wartosc) is fail_node:
@@ -122,7 +125,7 @@ class AhoCorasick(Alphabetizable, Graph):
 
         def draw(self, filename: str = "graph"):
 
-            dot = Digraph('G', filename=f"{filename}.gv", engine='sfdp')
+            dot = Digraph('G', filename=f"{filename}.gv", engine="sfdp")
             dot.attr(
                 splines="true",
                 overlap="false",
@@ -163,13 +166,13 @@ class AhoCorasick(Alphabetizable, Graph):
 
                 for char in cls.alfabet:
                     current_node = x
-                    # Przeskakujemy z wierzchołka do wierzchołka do momentu, aż znajdziemy wierzchołek z legalnym przejściem.
+                    # Przeskakujemy z wierzchołka do momentu, aż znajdziemy wierzchołek z legalnym przejściem.
                     while current_node is not root and current_node.next(char) is current_node:
                         current_node = current_node.fail
 
-                    # kiedy znajdziemy wierzchołek z legalnym przejściem (last transition nie jest None), dołóżmy go do listy edges.
-                    # jeżeli takiego nie ma dołóżmy przejście do stanu pustego (korzenia).
-                    # funkcja next przy braku znalezienia sąsiada o wartości char zwraca self.
+                    # Kiedy znajdziemy wierzchołek z legalnym przejściem (last transition nie jest None), dołóżmy go do listy edges.
+                    # Jeżeli takiego nie ma, dołóżmy przejście do stanu pustego (korzenia).
+                    # Funkcja next przy braku znalezienia sąsiada o wartości char zwraca self.
                     last_transition = current_node.next(char)
                     edges.append((last_transition if last_transition is not current_node else root, char))
 
@@ -179,7 +182,7 @@ class AhoCorasick(Alphabetizable, Graph):
 
         # Krawędzie można legalnie zamienić dopiero po zastosowaniu algorytmu bfs.
         # W przeciwnym razie będziemy modyfikowali wierzchołki w trakcie iteracji po nich.
-        # Być może jest to legalne w niektórych implementacjach ale to jednak trochę trudne.
+        # Być może jest to legalne w niektórych implementacjach, ale to jednak trochę trudne.
 
         for node, edges in new_edges.items():
             node.neighbors = edges
@@ -196,7 +199,7 @@ class AhoCorasick(Alphabetizable, Graph):
         root = builder(*wzorce)
 
         # zignorować błędy unexpected argument i błędy o typowaniu
-        # chyba wbudowany type checker nie domaga i przy ewaluacji typu Trie[cls.AhoNode] od razu zakłada, że typ builder to klasa Trie kiedy to nieprawda
+        # chyba wbudowany type checker nie domaga i przy ewaluacji typu Trie[cls.AhoNode] od razu zakłada, że typ builder to klasa Trie, kiedy to nieprawda
         with bfs(root) as search:
             search.begin(lambda node: node.fail_edge(root))
 

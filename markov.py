@@ -2,7 +2,6 @@
 import copy
 from fractions import Fraction
 import random
-
 import numpy
 
 # nasze
@@ -10,7 +9,6 @@ from graphs import AhoCorasick
 from nodes import Node, bfs
 from ownstring import Wzorzec
 from traits import Alphabetizable, zalfabetyzuj
-
 
 class Markov(Alphabetizable):
     @classmethod
@@ -28,7 +26,7 @@ class Markov(Alphabetizable):
                 """
                 Funkcja budująca częściowo macierz Markowa bez wykorzystania macierzy sąsiedztwa.
 
-                :param node: wierzchołek w grafie
+                :param node: Wierzchołek w grafie
                 :return: Nic. Funkcja zmienia zmienną macierz przy każdym wywołaniu.
                 """
 
