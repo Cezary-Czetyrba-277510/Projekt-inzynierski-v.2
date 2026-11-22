@@ -148,6 +148,7 @@ class AhoCorasick(Alphabetizable, Graph):
             dot = Digraph('G', filename=f"{filename}.gv", engine="sfdp")
             dot.attr(
                 splines="true",
+                remincross="true",
                 overlap="false",
                 sep="+20",
                 esep="+10",
