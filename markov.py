@@ -15,12 +15,18 @@ from ownstring import Wzorzec
 from traits import Alphabetizable, zalfabetyzuj, Drawable
 
 class Macierz(numpy.ndarray, Drawable):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.latex = ""
-        self.save = None
-        self.fig = None
+    def __array_finalize__(self, *args, **kwargs):
         return
+
+    @property
+    def rc(self):
+        return RcParams({
+                "text.usetex": True,
+                "text.latex.preamble": (
+                    r"\usepackage{amsmath}" "\n"
+                    fr"\setcounter{{MaxMatrixCols}}{{{self.shape[1]}}}"
+                )
+            })
 
     @classmethod
     def empty(cls, shape: tuple[int, ...], dtype, order: Literal["C", "F"] | None = "C") -> Self:
@@ -31,31 +37,26 @@ class Macierz(numpy.ndarray, Drawable):
         return cast(Self, numpy.full(shape, fill_value, dtype=dtype, order=order).view(cls))
 
     def draw(self, filename: str = "matrix"):
-        plt.rcParams["text.usetex"] = True
-        plt.rcParams["text.latex.preamble"] = (
-            r"\usepackage{amsmath}" "\n"
-            fr"\setcounter{{MaxMatrixCols}}{{{self.shape[1]}}}"
-        )
+        with plt.rc_context(rc=self.rc) as context:
+            self.latex = (
+                    r"\begin{bmatrix}"
+                    + r" \\ ".join(" & ".join(map(str, row)) for row in self)
+                    + r"\end{bmatrix}"
+            )
 
-        self.latex = (
-                r"\begin{bmatrix}"
-                + r" \\ ".join(" & ".join(map(str, row)) for row in self)
-                + r"\end{bmatrix}"
-        )
-
-        self.fig = plt.figure(figsize=(1, 1))
-        self.fig.text(0.05, 0.5, f"${self.latex}$", fontsize=14)
-        plt.axis("off")
-        self.save = partial(self.fig.savefig, fname=f"{filename}.pdf")
+            self.fig = plt.figure(figsize=(1, 1))
+            self.fig.text(0.05, 0.5, f"${self.latex}$", fontsize=14)
+            plt.axis("off")
+            self.save = partial(self.fig.savefig, fname=f"{filename}.pdf")
 
         return self
 
     def render(self):
-        self.save(bbox_inches="tight", pad_inches=0.1)
-        self.save = None
-
-        plt.close(self.fig)
-        self.fig = None
+        with plt.rc_context(rc=self.rc) as context:
+            self.save(bbox_inches="tight", pad_inches=0.1)
+            self.save = None
+            plt.close(self.fig)
+            self.fig = None
 
         return
 
