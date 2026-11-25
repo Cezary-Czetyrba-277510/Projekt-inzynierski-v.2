@@ -3,7 +3,7 @@ import copy
 from fractions import Fraction
 import random
 from functools import partial
-from typing import Literal
+from typing import Literal, Self, cast
 
 import numpy
 from matplotlib import pyplot as plt
@@ -18,17 +18,17 @@ class Macierz(numpy.ndarray, Drawable):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.latex = ""
+        self.save = None
+        self.fig = None
         return
 
     @classmethod
-    def empty(cls, shape: tuple[int, ...], dtype: object = float, order: Literal["C", "F"] | None = "C"):
-        return numpy.empty(shape, dtype=dtype, order=order).view(cls)
+    def empty(cls, shape: tuple[int, ...], dtype, order: Literal["C", "F"] | None = "C") -> Self:
+        return cast(Self, numpy.empty(shape, dtype=dtype, order=order).view(cls))
 
     @classmethod
-    def full(cls, shape: tuple[int, ...], fill_value, dtype = None, order: Literal["C", "F"] | None = "C"):
-        return numpy.full(
-            shape, fill_value, dtype=dtype, order=order
-        ).view(cls)
+    def full(cls, shape: tuple[int, ...], fill_value, dtype, order: Literal["C", "F"] | None = "C") -> Self:
+        return cast(Self, numpy.full(shape, fill_value, dtype=dtype, order=order).view(cls))
 
     def draw(self, filename: str = "matrix"):
         plt.rcParams["text.usetex"] = True
@@ -52,6 +52,8 @@ class Macierz(numpy.ndarray, Drawable):
 
     def render(self):
         self.save(bbox_inches="tight", pad_inches=0.1)
+        self.save = None
+
         plt.close(self.fig)
         self.fig = None
 
